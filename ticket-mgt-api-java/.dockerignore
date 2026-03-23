@@ -1,0 +1,21 @@
+# Development
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*~
+
+# IDE configurations
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Maven dependencies
+.m2/
+
+# macOS specifix
+.DS_Store
+
+# Logs & Database output
+*.log
+data/
+h2-data/

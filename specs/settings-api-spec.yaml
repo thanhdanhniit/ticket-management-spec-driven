@@ -1,0 +1,845 @@
+openapi: 3.0.3
+info:
+  title: Settings API
+  description: Enterprise-grade API for managing organizational settings, users, teams, permissions, audit logs, and postmortem templates.
+  version: 1.0.0
+
+servers:
+  - url: https://api.ticketmanagement.internal/v1/settings
+    description: Production Settings API
+
+security:
+  - BearerAuth: []
+
+paths:
+  # --------------------------------------------------------------------------------
+  # Users
+  # --------------------------------------------------------------------------------
+  /users:
+    get:
+      summary: List users
+      description: Retrieves a paginated list of organizational users with search and filtering capabilities.
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: query
+          in: query
+          description: Search text for name or email
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by user status
+          schema:
+            type: string
+            enum: [ACTIVE, INVITATION_PENDING, INACTIVE]
+      responses:
+        '200':
+          description: Successfully retrieved list of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Add new users (Manual or Bulk)
+      description: Invite one or multiple users to the organization, assigning base organizational roles.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddUsersRequest'
+      responses:
+        '201':
+          description: Users successfully invited/created.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # --------------------------------------------------------------------------------
+  # Organization Roles
+  # --------------------------------------------------------------------------------
+  /organization-roles:
+    get:
+      summary: List organization roles and permissions
+      description: Retrieves the matrix of organizational roles and their capabilities.
+      tags:
+        - Organization Permissions
+      responses:
+        '200':
+          description: Matrix of organization roles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationRole'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /organization-roles/{id}:
+    put:
+      summary: Update organization role permissions
+      description: Modifies the feature access matrix for a specific custom organization role.
+      tags:
+        - Organization Permissions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationRoleRequest'
+      responses:
+        '200':
+          description: Successfully updated role.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # --------------------------------------------------------------------------------
+  # Teams
+  # --------------------------------------------------------------------------------
+  /teams:
+    get:
+      summary: List teams
+      description: Retrieves a list of active teams in the organization.
+      tags:
+        - Teams
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Successfully retrieved list of teams.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new team
+      description: Instantiates a new team entity requiring a name and an explicit mandatory default user.
+      tags:
+        - Teams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '201':
+          description: Team successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  # --------------------------------------------------------------------------------
+  # Team Members
+  # --------------------------------------------------------------------------------
+  /teams/{teamId}/members:
+    get:
+      summary: List team members
+      description: Retrieves the member roster for a specific team, including their specific team roles.
+      tags:
+        - Team Members
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: query
+          in: query
+          description: Search roster by name explicitly
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Team roster retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberListResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    post:
+      summary: Add members to team
+      description: Appends existing organizational users to the team and provisions local contextual roles.
+      tags:
+        - Team Members
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeamMembersRequest'
+      responses:
+        '201':
+          description: Members successfully added to the team.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /teams/{teamId}/members/{userId}:
+    put:
+      summary: Edit team member roles
+      description: Updates the specific team-level roles granted to an existing member.
+      tags:
+        - Team Members
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamMemberRolesRequest'
+      responses:
+        '200':
+          description: Member roles successfully updated.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+          description: Warning logic triggers here if attempting to remove the mandatory 'Default User' access without reassignment.
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      summary: Remove member from team
+      description: Ejects a member from the target team roster entirely.
+      tags:
+        - Team Members
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+          description: Cannot remove the default team user without systemic re-assignment.
+
+  # --------------------------------------------------------------------------------
+  # Team Roles
+  # --------------------------------------------------------------------------------
+  /teams/{teamId}/roles:
+    get:
+      summary: List team roles
+      description: Retrieves standard and custom capability matrices strictly scoped to the active team.
+      tags:
+        - Team Roles
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of defined roles and their CRUD matrices.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamRole'
+
+    post:
+      summary: Create a custom team role
+      description: Generates a new role and meticulously maps distinct local CRUD entity boundaries to it.
+      tags:
+        - Team Roles
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRoleRequest'
+      responses:
+        '201':
+          description: Successfully created.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /teams/{teamId}/roles/{roleId}:
+    put:
+      summary: Edit a custom team role
+      description: Organically modifies the underlying boolean CRUD matrix of an existing custom role.
+      tags:
+        - Team Roles
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRoleRequest'
+      responses:
+        '200':
+          description: Matrix successfully updated.
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          description: Forbidden to edit system-immutable locked roles (e.g. "Manage Team").
+
+    delete:
+      summary: Delete a custom team role
+      description: Obliterate an obsolete role explicitly from the active team hierarchy.
+      tags:
+        - Team Roles
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Correctly eliminated.
+        '403':
+          description: Forbidden to delete system-immutable roles.
+
+  # --------------------------------------------------------------------------------
+  # Postmortem Templates
+  # --------------------------------------------------------------------------------
+  /postmortem-templates:
+    get:
+      summary: List postmortem templates
+      description: Retrieves organization-wide templates utilized for generating incident postmortems.
+      tags:
+        - Postmortem Templates
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostmortemTemplate'
+
+    post:
+      summary: Create template
+      description: Adds a new structured postmortem template.
+      tags:
+        - Postmortem Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Successfully authored.
+
+  /postmortem-templates/{id}:
+    put:
+      summary: Update template
+      tags:
+        - Postmortem Templates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '200':
+          description: Success.
+
+    delete:
+      summary: Delete template
+      tags:
+        - Postmortem Templates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Deleted effectively.
+
+  # --------------------------------------------------------------------------------
+  # Audit Logs
+  # --------------------------------------------------------------------------------
+  /audit-logs:
+    get:
+      summary: List system audit logs
+      description: Retrieves read-only, immutable historical operational data utilizing extensive filters.
+      tags:
+        - Audit Logs
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: actee
+          in: query
+          schema:
+            type: string
+        - name: actor
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: startTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Logs returned effectively.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogListResponse'
+
+# --------------------------------------------------------------------------------
+# Components
+# --------------------------------------------------------------------------------
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: "Page number (0-indexed)."
+      required: false
+      schema:
+        type: integer
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      description: "Number of records per page."
+      required: false
+      schema:
+        type: integer
+        default: 20
+    SortParam:
+      name: sort
+      in: query
+      description: "Sort mapping, e.g. createdAt,desc"
+      required: false
+      schema:
+        type: string
+
+  schemas:
+    StandardErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+    # User Models
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        organizationRole:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INVITATION_PENDING, INACTIVE]
+    
+    UserListResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    AddUsersRequest:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            required:
+              - email
+              - role
+            properties:
+              email:
+                type: string
+                format: email
+              role:
+                type: string
+
+    # Organization Role
+    OrganizationRole:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        isImmutable:
+          type: boolean
+        permissions:
+          $ref: '#/components/schemas/EntityPermissionMatrix'
+
+    UpdateOrganizationRoleRequest:
+      type: object
+      required:
+        - permissions
+      properties:
+        permissions:
+          $ref: '#/components/schemas/EntityPermissionMatrix'
+
+    # Team Models
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        defaultUserId:
+          type: string
+          format: uuid
+        isImmutable:
+          type: boolean
+
+    CreateTeamRequest:
+      type: object
+      required:
+        - name
+        - defaultUserId
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        defaultUserId:
+          type: string
+          format: uuid
+
+    TeamListResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        totalElements:
+          type: integer
+
+    # Team Membership Models
+    TeamMember:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+        isDefaultUser:
+          type: boolean
+        teamRoles:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    TeamMemberListResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        totalElements:
+          type: integer
+
+    AddTeamMembersRequest:
+      type: object
+      required:
+        - userIds
+      properties:
+        userIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        teamRoleIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    UpdateTeamMemberRolesRequest:
+      type: object
+      required:
+        - teamRoleIds
+      properties:
+        teamRoleIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    # Team Role Models
+    EntityPermissionMatrix:
+      description: "A dynamic key-value matrix mapping system entities (e.g. 'schedules', 'postmortems') to their respective boolean CRUD capabilities."
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          create:
+            type: boolean
+          read:
+            type: boolean
+          update:
+            type: boolean
+          delete:
+            type: boolean
+
+    TeamRole:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        isImmutable:
+          type: boolean
+        permissions:
+          $ref: '#/components/schemas/EntityPermissionMatrix'
+
+    CreateTeamRoleRequest:
+      type: object
+      required:
+        - name
+        - permissions
+      properties:
+        name:
+          type: string
+          minLength: 1
+        permissions:
+          $ref: '#/components/schemas/EntityPermissionMatrix'
+
+    UpdateTeamRoleRequest:
+      type: object
+      required:
+        - permissions
+      properties:
+        name:
+          type: string
+        permissions:
+          $ref: '#/components/schemas/EntityPermissionMatrix'
+
+    # Postmortem Template Models
+    PostmortemTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        content:
+          type: string
+
+    CreateTemplateRequest:
+      type: object
+      required:
+        - name
+        - content
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+
+    # Audit Log Models
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        actorName:
+          type: string
+        actorEmail:
+          type: string
+        action:
+          type: string
+        actee:
+          type: string
+        details:
+          type: object
+          additionalProperties: {}
+
+    AuditLogListResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+  responses:
+    BadRequestError:
+      description: Bad Request Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    NotFoundError:
+      description: Resource Not Found Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'

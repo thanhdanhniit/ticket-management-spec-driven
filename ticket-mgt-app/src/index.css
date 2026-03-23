@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-surface font-sans text-slate-800 antialiased;
+    margin: 0;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+}
+
+@layer utilities {
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-text text-sm font-medium
+           transition-all duration-150 hover:bg-sidebar-hover hover:text-sidebar-textActive cursor-pointer;
+  }
+
+  .nav-link.active {
+    @apply bg-sidebar-active text-sidebar-textActive;
+  }
+}
