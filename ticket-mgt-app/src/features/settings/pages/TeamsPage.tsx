@@ -46,8 +46,8 @@ export default function TeamsPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2 -mb-px ${activeTab === tab
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
                     }`}
                 >
                   {tab}
