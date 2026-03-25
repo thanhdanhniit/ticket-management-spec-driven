@@ -26,8 +26,8 @@ Using the ReactFrontendArchitect skill and UI specs *ui_spec.md at specs folder 
 ## Step 4 — Routing Integration
 Update the React Router configuration to register all generated feature pages.
 
-## Step 5 — Integration Testing.
+## Step 5 — Integration Testing. - skips
 
 
-Run
+## Run
 npm run dev
