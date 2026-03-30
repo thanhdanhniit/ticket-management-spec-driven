@@ -2,7 +2,7 @@
 Using the UISpecArchitect skill, analyze this UI screenshot to generate UI spec at spec folder. Recommend to reference to shared global sidebar and shared top navigation bar ui-specs.
 
 ## Generate User stories
-<upload UI-screenshot> Using the UserStoryArchitect skill, analyze the provided UI screenshot and generate business-readable user stories put it into ./docs with .md format
+Using the UserStoryArchitect skill, analyze and generate business-readable user stories for each UI Spec at this folder specs/services/.
 
 ## Generate API Spec
-Using the APISpecArchitect skill to generate api specs for settings domain based on user stories at docs/settings/*.md and ui-specs at specs/settings/*.md.
+Using the APISpecArchitect skill to generate api specs for services management domain based on user stories at docs/services/*.md and ui-specs at specs/services/*.md.
