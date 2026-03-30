@@ -5,6 +5,8 @@ User Stories + UI Specs
       ↓
 OpenAPI Spec
       ↓
+DB Design and Architecture
+      ↓
 AI Code Generation
       ↓
 Spring Boot Services
@@ -13,7 +15,7 @@ Docker Deployment
 
 # Generate Code in Stages
 
-Project skeleton
+Project skeleton (skip if it already exists)
    ↓
 Domain Layer
    ↓

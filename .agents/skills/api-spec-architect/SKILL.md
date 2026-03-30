@@ -130,3 +130,14 @@ Each endpoint must include:
 - description
 - request body schema
 - response schema
+
+
+## Design and Code generation for Services Management module
+
+### Step 1 — Generate high-level design and DB Schema
+Using the JavaBackendArchitect skill, analyze specs/services-api-spec.yaml, the UI specs in specs/services/, and the user stories in docs/services/.
+
+Suggest the Java Spring Boot architecture and Database Design for the Services Management module. Please provide:
+- ER Diagram/Schema Design: Define JPA entities, relationships (One-to-Many for Maintenance Windows, Many-to-One for Owners/Policies), and data types.
+- Concurrency & Logic: Explain how to handle the Maintenance Mode recurrence logic and calculation of MTTR/MTTA stats.
+

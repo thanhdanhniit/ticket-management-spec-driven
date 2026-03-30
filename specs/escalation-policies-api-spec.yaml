@@ -1,0 +1,247 @@
+openapi: 3.0.3
+info:
+  title: Escalation Policy Management API
+  description: API specification for managing incident routing rules, configuring hierarchical sequence steps, and assigning automated alerts to targets (Users/Teams).
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: Main routing API
+
+tags:
+  - name: Escalation Policies
+    description: Core CRUD operations for managing escalation sequence models
+
+paths:
+  /escalation-policies:
+    get:
+      summary: List Escalation Policies
+      description: Returns a paginated catalog of all configured escalation policies. Designed to populate the main list View and process dynamic query-based searching.
+      tags:
+        - Escalation Policies
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          description: Page index requested
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 20
+          description: Total rows per page
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: name,asc
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Live string query utilized strictly by the List View search bar
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationPolicyPaginatedResource'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+    post:
+      summary: Create Escalation Policy
+      description: Initiates a new policy structure mapping. The request requires at least one escalation step.
+      tags:
+        - Escalation Policies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationPolicyMutationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationPolicyDetail'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /escalation-policies/{id}:
+    get:
+      summary: Fetch specific Escalation Policy
+      description: Retrieves a highly specific policy explicitly pre-populating fields and sequence blocks.
+      tags:
+        - Escalation Policies
+      parameters:
+        - $ref: '#/components/parameters/PolicyIdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationPolicyDetail'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      summary: Update Escalation Policy
+      description: Replaces an existing policy array safely ensuring users have not mapped 0 steps.
+      tags:
+        - Escalation Policies
+      parameters:
+        - $ref: '#/components/parameters/PolicyIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationPolicyMutationRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationPolicyDetail'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+          
+    delete:
+      summary: Delete Escalation Policy
+      description: Destructive row action completely deleting a policy only if not linked to active services.
+      tags:
+        - Escalation Policies
+      parameters:
+        - $ref: '#/components/parameters/PolicyIdPath'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Policy fundamentally blocked from deletion because it is actively assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+components:
+  parameters:
+    PolicyIdPath:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequestError:
+      description: Payload validation fault.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFoundError:
+      description: Unresolved target record.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Systemic error processing request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+    EscalationStep:
+      type: object
+      required:
+        - waitTimeMinutes
+        - targetId
+      properties:
+        id:
+          type: string
+          format: uuid
+        waitTimeMinutes:
+          type: integer
+          minimum: 0
+        targetId:
+          type: string
+          format: uuid
+
+    EscalationPolicyDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationStep'
+
+    EscalationPolicyPaginatedResource:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationPolicyDetail'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    EscalationPolicyMutationRequest:
+      type: object
+      description: Validation logic enforcing 1 to N sequence step blocks minimum.
+      required:
+        - name
+        - steps
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        steps:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/EscalationStep'
