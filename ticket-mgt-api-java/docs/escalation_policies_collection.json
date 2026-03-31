@@ -1,0 +1,410 @@
+{
+  "info": {
+    "name": "Escalation Policy Management API",
+    "description": "Postman collection for the Escalation Policies domain. Covers full CRUD operations as defined in specs/escalation-policies-api-spec.yaml.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "bearer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "policy_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login (Generate JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/login",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"bearer_token\", jsonData.token);",
+                  "    console.log(\"Saved JWT to Collection Variables successfully!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Escalation Policies",
+      "description": "Full CRUD operations for the Escalation Policies domain.",
+      "item": [
+        {
+          "id": "ep-list-001",
+          "name": "List Escalation Policies",
+          "request": {
+            "name": "List Escalation Policies",
+            "description": {
+              "content": "Returns a paginated list of all escalation policies. Supports search filtering via the 'search' query parameter.",
+              "type": "text/plain"
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies?page=0&size=20&sort=name,asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": { "content": "Page index (0-indexed)", "type": "text/plain" }
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": { "content": "Number of records per page", "type": "text/plain" }
+                },
+                {
+                  "key": "sort",
+                  "value": "name,asc",
+                  "description": { "content": "Sort field and direction", "type": "text/plain" }
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": { "content": "Optional: filter by policy name", "type": "text/plain" }
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Paginated list returned",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": \"<uuid>\",\n      \"name\": \"Standard On-Call Escalation\",\n      \"description\": \"Default 3-step escalation\",\n      \"steps\": [\n        { \"id\": \"<uuid>\", \"stepOrder\": 1, \"waitTimeMinutes\": 0, \"targetId\": \"<uuid>\", \"targetType\": \"USER\" },\n        { \"id\": \"<uuid>\", \"stepOrder\": 2, \"waitTimeMinutes\": 15, \"targetId\": \"<uuid>\", \"targetType\": \"TEAM\" }\n      ]\n    }\n  ],\n  \"page\": 0,\n  \"size\": 20,\n  \"totalElements\": 2,\n  \"totalPages\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "500 Internal Server Error",
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 500,\n  \"error\": \"Internal Server Error\",\n  \"message\": \"An unexpected error occurred.\",\n  \"path\": \"/api/v1/escalation-policies\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        },
+        {
+          "id": "ep-list-search-001",
+          "name": "Search Escalation Policies by Name",
+          "request": {
+            "name": "Search Escalation Policies by Name",
+            "description": {
+              "content": "Filters the list using the live search bar. Pass a partial name to narrow results.",
+              "type": "text/plain"
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies?page=0&size=20&search=Critical",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "search", "value": "Critical", "description": { "content": "Partial name match", "type": "text/plain" } }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Filtered results",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": \"<uuid>\",\n      \"name\": \"Critical Incident Fast-Track\",\n      \"description\": \"Aggressive 2-step escalation for P0 incidents\",\n      \"steps\": []\n    }\n  ],\n  \"page\": 0,\n  \"size\": 20,\n  \"totalElements\": 1,\n  \"totalPages\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        },
+        {
+          "id": "ep-get-001",
+          "name": "Get Escalation Policy by ID",
+          "request": {
+            "name": "Get Escalation Policy by ID",
+            "description": {
+              "content": "Fetches a single policy to pre-populate the Edit overlay form.",
+              "type": "text/plain"
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies/{{policy_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies", "{{policy_id}}"],
+              "variable": [
+                {
+                  "key": "policy_id",
+                  "value": "{{policy_id}}",
+                  "description": { "content": "UUID of the escalation policy", "type": "text/plain" }
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Policy found",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": \"<uuid>\",\n  \"name\": \"Standard On-Call Escalation\",\n  \"description\": \"Default 3-step escalation\",\n  \"steps\": [\n    { \"id\": \"<uuid>\", \"stepOrder\": 1, \"waitTimeMinutes\": 0, \"targetId\": \"<uuid>\", \"targetType\": \"USER\" },\n    { \"id\": \"<uuid>\", \"stepOrder\": 2, \"waitTimeMinutes\": 15, \"targetId\": \"<uuid>\", \"targetType\": \"TEAM\" }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Escalation policy not found with id: <uuid>\",\n  \"path\": \"/api/v1/escalation-policies/<uuid>\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        },
+        {
+          "id": "ep-create-001",
+          "name": "Create Escalation Policy",
+          "request": {
+            "name": "Create Escalation Policy",
+            "description": {
+              "content": "Creates a new escalation policy. Requires at least one step (minItems=1). Each step requires waitTimeMinutes, targetId, and targetType (USER or TEAM).",
+              "type": "text/plain"
+            },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Escalation Policy\",\n  \"description\": \"Escalates to on-call engineer, then to team lead.\",\n  \"steps\": [\n    {\n      \"waitTimeMinutes\": 0,\n      \"targetId\": \"00000000-0000-0000-0000-000000000001\",\n      \"targetType\": \"USER\"\n    },\n    {\n      \"waitTimeMinutes\": 15,\n      \"targetId\": \"00000000-0000-0000-0000-000000000010\",\n      \"targetType\": \"TEAM\"\n    }\n  ]\n}",
+              "options": {
+                "raw": { "headerFamily": "json", "language": "json" }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set(\"policy_id\", jsonData.id);",
+                  "    console.log(\"Saved policy_id: \" + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": \"<uuid>\",\n  \"name\": \"New Escalation Policy\",\n  \"description\": \"Escalates to on-call engineer, then to team lead.\",\n  \"steps\": [\n    { \"id\": \"<uuid>\", \"stepOrder\": 1, \"waitTimeMinutes\": 0, \"targetId\": \"<uuid>\", \"targetType\": \"USER\" },\n    { \"id\": \"<uuid>\", \"stepOrder\": 2, \"waitTimeMinutes\": 15, \"targetId\": \"<uuid>\", \"targetType\": \"TEAM\" }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "400 Bad Request - Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"name: Policy name is required; steps: At least one escalation step is required\",\n  \"path\": \"/api/v1/escalation-policies\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        },
+        {
+          "id": "ep-update-001",
+          "name": "Update Escalation Policy",
+          "request": {
+            "name": "Update Escalation Policy",
+            "description": {
+              "content": "Replaces an existing policy. Steps are fully replaced (not patched). At least one step must be provided.",
+              "type": "text/plain"
+            },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Escalation Policy\",\n  \"description\": \"Updated description with revised routing.\",\n  \"steps\": [\n    {\n      \"waitTimeMinutes\": 0,\n      \"targetId\": \"00000000-0000-0000-0000-000000000001\",\n      \"targetType\": \"USER\"\n    },\n    {\n      \"waitTimeMinutes\": 20,\n      \"targetId\": \"00000000-0000-0000-0000-000000000011\",\n      \"targetType\": \"TEAM\"\n    },\n    {\n      \"waitTimeMinutes\": 45,\n      \"targetId\": \"00000000-0000-0000-0000-000000000001\",\n      \"targetType\": \"USER\"\n    }\n  ]\n}",
+              "options": {
+                "raw": { "headerFamily": "json", "language": "json" }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies/{{policy_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies", "{{policy_id}}"],
+              "variable": [
+                { "key": "policy_id", "value": "{{policy_id}}" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK - Updated successfully",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": \"<uuid>\",\n  \"name\": \"Updated Escalation Policy\",\n  \"description\": \"Updated description with revised routing.\",\n  \"steps\": [\n    { \"id\": \"<uuid>\", \"stepOrder\": 1, \"waitTimeMinutes\": 0, \"targetId\": \"<uuid>\", \"targetType\": \"USER\" },\n    { \"id\": \"<uuid>\", \"stepOrder\": 2, \"waitTimeMinutes\": 20, \"targetId\": \"<uuid>\", \"targetType\": \"TEAM\" },\n    { \"id\": \"<uuid>\", \"stepOrder\": 3, \"waitTimeMinutes\": 45, \"targetId\": \"<uuid>\", \"targetType\": \"USER\" }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Escalation policy not found with id: <uuid>\",\n  \"path\": \"/api/v1/escalation-policies/<uuid>\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "400 Bad Request - Empty steps array",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"steps: At least one escalation step is required\",\n  \"path\": \"/api/v1/escalation-policies/<uuid>\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        },
+        {
+          "id": "ep-delete-001",
+          "name": "Delete Escalation Policy",
+          "request": {
+            "name": "Delete Escalation Policy",
+            "description": {
+              "content": "Deletes a policy. Returns 409 Conflict if the policy is currently assigned to an active service.",
+              "type": "text/plain"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/escalation-policies/{{policy_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalation-policies", "{{policy_id}}"],
+              "variable": [
+                { "key": "policy_id", "value": "{{policy_id}}" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "204 No Content - Deleted successfully",
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Escalation policy not found with id: <uuid>\",\n  \"path\": \"/api/v1/escalation-policies/<uuid>\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "name": "409 Conflict - Policy in use by active service",
+              "status": "Conflict",
+              "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"<dateTime>\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Cannot delete escalation policy 'Standard On-Call Escalation' because it is assigned to one or more active services.\",\n  \"path\": \"/api/v1/escalation-policies/<uuid>\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": { "disableBodyPruning": true }
+        }
+      ]
+    }
+  ]
+}

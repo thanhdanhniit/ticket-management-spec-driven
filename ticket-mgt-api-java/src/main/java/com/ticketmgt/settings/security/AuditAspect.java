@@ -34,7 +34,10 @@ public class AuditAspect {
               "execution(* com.ticketmgt.settings.service.*.update*(..)) || " +
               "execution(* com.ticketmgt.settings.service.*.delete*(..)) || " +
               "execution(* com.ticketmgt.settings.service.*.add*(..)) || " +
-              "execution(* com.ticketmgt.settings.service.*.remove*(..))")
+              "execution(* com.ticketmgt.settings.service.*.remove*(..)) || " +
+              "execution(* com.ticketmgt.escalationpolicy.service.*.create*(..)) || " +
+              "execution(* com.ticketmgt.escalationpolicy.service.*.update*(..)) || " +
+              "execution(* com.ticketmgt.escalationpolicy.service.*.delete*(..))")
     public void auditMethods() {}
 
     @AfterReturning(pointcut = "auditMethods()", returning = "result")
