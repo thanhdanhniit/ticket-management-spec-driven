@@ -31,6 +31,9 @@ public class EscalationPolicyService {
     private final EscalationPolicyRepository policyRepository;
     private final EscalationStepRepository stepRepository;
     private final EscalationPolicyMapper mapper;
+    private final com.ticketmgt.settings.repository.UserRepository userRepository;
+    private final com.ticketmgt.settings.repository.TeamRepository teamRepository;
+
 
     /**
      * List policies with optional search and pagination.
@@ -46,8 +49,11 @@ public class EscalationPolicyService {
         log.info("Listing escalation policies: page={}, size={}, search={}, totalElements={}",
                 page, size, search, result.getTotalElements());
 
+        List<EscalationPolicyDTO> dtoList = mapper.toDtoList(result.getContent());
+        enrichPolicyDtos(dtoList);
+
         return EscalationPolicyListResponse.builder()
-                .content(mapper.toDtoList(result.getContent()))
+                .content(dtoList)
                 .page(result.getNumber())
                 .size(result.getSize())
                 .totalElements(result.getTotalElements())
@@ -62,7 +68,7 @@ public class EscalationPolicyService {
     @Transactional(readOnly = true)
     public EscalationPolicyDTO getById(UUID id) {
         EscalationPolicy policy = findOrThrow(id);
-        return mapper.toDto(policy);
+        return enrichPolicyDto(mapper.toDto(policy));
     }
 
     /**
@@ -80,7 +86,7 @@ public class EscalationPolicyService {
         stepRepository.saveAll(steps);
 
         // Reload to return the fully hydrated entity with steps
-        return mapper.toDto(findOrThrow(policy.getId()));
+        return enrichPolicyDto(mapper.toDto(findOrThrow(policy.getId())));
     }
 
     /**
@@ -104,7 +110,7 @@ public class EscalationPolicyService {
 
         policyRepository.save(policy);
 
-        return mapper.toDto(findOrThrow(policy.getId()));
+        return enrichPolicyDto(mapper.toDto(findOrThrow(policy.getId())));
     }
 
     /**
@@ -160,5 +166,26 @@ public class EscalationPolicyService {
             return PageRequest.of(page, size, Sort.by(direction, parts[0].trim()));
         }
         return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+    }
+
+    private void enrichPolicyDtos(List<EscalationPolicyDTO> dtos) {
+        if (dtos != null) {
+            dtos.forEach(this::enrichPolicyDto);
+        }
+    }
+
+    private EscalationPolicyDTO enrichPolicyDto(EscalationPolicyDTO dto) {
+        if (dto != null && dto.getSteps() != null) {
+            dto.getSteps().forEach(step -> {
+                if (step.getTargetId() != null && "USER".equalsIgnoreCase(step.getTargetType())) {
+                    userRepository.findById(step.getTargetId())
+                            .ifPresent(u -> step.setTargetName(u.getFullName()));
+                } else if (step.getTargetId() != null && "TEAM".equalsIgnoreCase(step.getTargetType())) {
+                    teamRepository.findById(step.getTargetId())
+                            .ifPresent(t -> step.setTargetName(t.getName()));
+                }
+            });
+        }
+        return dto;
     }
 }

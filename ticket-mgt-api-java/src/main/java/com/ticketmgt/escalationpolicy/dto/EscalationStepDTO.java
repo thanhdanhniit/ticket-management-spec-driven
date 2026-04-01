@@ -17,4 +17,5 @@ public class EscalationStepDTO {
     private Integer waitTimeMinutes;
     private UUID targetId;
     private String targetType;
+    private String targetName; // Enriched via service
 }

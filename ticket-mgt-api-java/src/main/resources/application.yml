@@ -31,7 +31,12 @@ app:
       secret: ${JWT_SECRET:veryLongSecretKeyForJWTGenerationThatMustBeAtLeast256BitsLong}
       expiration-ms: 86400000 # 1 day
 
+escalation:
+  scheduler:
+    fixed-delay-ms: 30000  # poll every 30 seconds
+
 logging:
   level:
     org.springframework.security: DEBUG
     com.ticketmgt.settings: DEBUG
+    com.ticketmgt.escalationpolicy.engine: DEBUG
