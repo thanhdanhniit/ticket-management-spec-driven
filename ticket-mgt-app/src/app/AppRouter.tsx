@@ -18,6 +18,9 @@ const TeamsPage = lazy(() => import('../features/settings/pages/TeamsPage'));
 const PostmortemTemplatesPage = lazy(() => import('../features/settings/pages/PostmortemTemplatesPage'));
 const AuditLogsPage = lazy(() => import('../features/settings/pages/AuditLogsPage'));
 
+// ── Escalation Policies ───────────────────────────────────────────────────────
+const EscalationPoliciesPage = lazy(() => import('../features/escalation-policy/pages/EscalationPoliciesPage'));
+
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen">
     <LoadingSpinner fullPage />
@@ -47,7 +50,7 @@ export default function AppRouter() {
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/incidents" element={<ComingSoon label="Incidents" />} />
-              <Route path="/escalation-policies" element={<ComingSoon label="Escalation Policies" />} />
+              <Route path="/escalation-policies" element={<EscalationPoliciesPage />} />
               <Route path="/services" element={<ComingSoon label="Services" />} />
               <Route path="/schedules" element={<ComingSoon label="Schedules" />} />
               <Route path="/runbooks" element={<ComingSoon label="Runbooks" />} />
