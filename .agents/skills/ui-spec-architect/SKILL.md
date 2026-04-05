@@ -1,24 +1,55 @@
 ---
 name: UISpecArchitect
-description: Generates structured UI specifications from UI screenshots.
+description: Generates structured UI specifications from extracted UI structure.
 ---
 
 # Instructions
 
 ## Objective
-Generate a UI specification document based on provided UI screenshots.
+Generate a UI specification document based on the provided UI Structure JSON.
 
-The output must strictly follow the predefined structure below.
+The UI Structure JSON represents the layout and components extracted from a UI screenshot.
+
+Use this structure as the primary source of truth.
+
+---
+
+## Input
+
+UI Structure JSON describing:
+
+- page name
+- layout
+- sections
+- components
+- labels
+- table columns
+- form fields
+
+---
 
 ## UI Analysis
 
-When analyzing screenshots:
-- Identify page purpose.
-- Identify layout sections (header, filters, tables, forms, etc.).
-- Detect UI components such as buttons, inputs, dropdowns, tables, and pagination.
-- Extract visible fields and table columns.
-- Identify user actions (create, edit, delete, search, navigation).
-- Infer navigation between pages if visible.
+When generating the UI specification:
+
+- Interpret the purpose of the page.
+- Describe layout sections and their roles.
+- Document UI components and their behavior.
+- Convert detected form fields into field definitions.
+- Convert detected tables into table schemas.
+- Infer reasonable user actions based on UI components.
+
+Examples of user actions:
+
+- create
+- edit
+- delete
+- search
+- filter
+- navigate
+- submit form
+
+---
 
 ## Output Format
 
@@ -46,9 +77,12 @@ Generate the UI specification using the following structure.
 
 ## Error / Empty States
 
+---
+
 ## Guidelines
 
 - Use clear and concise descriptions.
-- Fields must align with API models when possible.
-- Avoid describing backend business logic.
-- Focus only on UI behavior and interactions.
+- Fields should align with potential API models when possible.
+- Avoid backend business logic.
+- Focus on UI behavior and interactions.
+- Base all interpretations on the provided UI structure.

@@ -1,0 +1,186 @@
+{
+  "page": {
+    "name": "Define Service",
+    "layout": "Sidebar Layout with Header, Content Area and Right Help Sidebar",
+    "sections": [
+      {
+        "id": "header",
+        "type": "header",
+        "components": [
+          {
+            "id": "page-title",
+            "type": "typography",
+            "label": "Define Service",
+            "properties": {
+              "variant": "h1"
+            }
+          },
+          {
+            "id": "page-subtitle",
+            "type": "typography",
+            "label": "Create a service and add alert source integrations to begin receiving incidents",
+            "properties": {
+              "variant": "subtitle"
+            }
+          }
+        ]
+      },
+      {
+        "id": "form-section",
+        "type": "form",
+        "components": [
+          {
+            "id": "team-name-field",
+            "type": "input",
+            "label": "Team Name",
+            "properties": {
+              "value": "Default Team",
+              "status": "disabled/readonly"
+            }
+          },
+          {
+            "id": "service-name-field",
+            "type": "text-input",
+            "label": "Service Name *",
+            "properties": {
+              "value": "Payment Service",
+              "required": true
+            }
+          },
+          {
+            "id": "service-description-field",
+            "type": "textarea",
+            "label": "Service Description",
+            "properties": {
+              "value": "Payment Service",
+              "placeholder": "Briefly describe the service"
+            }
+          },
+          {
+            "id": "escalation-policy-field",
+            "type": "select",
+            "label": "Escalation Policy *",
+            "properties": {
+              "value": "Payment Escalate Policy",
+              "required": true
+            }
+          },
+          {
+            "id": "owner-field",
+            "type": "select",
+            "label": "Owner *",
+            "properties": {
+              "value": "Michael Nguyen (carolynne)",
+              "required": true
+            }
+          },
+          {
+            "id": "tags-field-group",
+            "type": "dynamic-list",
+            "label": "Tags",
+            "components": [
+              {
+                "id": "tag-row-1",
+                "type": "row",
+                "components": [
+                  {
+                    "id": "tag-key-1",
+                    "type": "select",
+                    "label": "Key",
+                    "properties": {
+                      "placeholder": "Key"
+                    }
+                  },
+                  {
+                    "id": "tag-value-1",
+                    "type": "select",
+                    "label": "Value",
+                    "properties": {
+                      "placeholder": "Value"
+                    }
+                  },
+                  {
+                    "id": "remove-tag-1",
+                    "type": "icon-button",
+                    "label": "",
+                    "properties": {
+                      "icon": "cross/X"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "add-tag-action",
+                "type": "button",
+                "label": "Add Tag",
+                "properties": {
+                  "variant": "ghost/link"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "actions-footer",
+        "type": "toolbar",
+        "components": [
+          {
+            "id": "save-button",
+            "type": "button",
+            "label": "Save",
+            "properties": {
+              "variant": "primary"
+            }
+          },
+          {
+            "id": "cancel-button",
+            "type": "button",
+            "label": "Cancel",
+            "properties": {
+              "variant": "outline"
+            }
+          }
+        ]
+      },
+      {
+        "id": "help-guide-sidebar",
+        "type": "sidebar",
+        "components": [
+          {
+            "id": "help-title",
+            "type": "typography",
+            "label": "Help and Guide",
+            "properties": {
+              "variant": "h2"
+            }
+          },
+          {
+            "id": "help-item-1",
+            "type": "section",
+            "label": "What's a Service?",
+            "properties": {
+              "link": "Read More"
+            }
+          },
+          {
+            "id": "help-item-2",
+            "type": "section",
+            "label": "How to pick an Owner?",
+            "properties": {
+              "link": "Read More"
+            }
+          },
+          {
+            "id": "help-item-3",
+            "type": "section",
+            "label": "How to use Tags?",
+            "properties": {
+              "link": "Read More"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

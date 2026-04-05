@@ -45,7 +45,7 @@ export const escalationPolicyService = {
   createPolicy: async (
     payload: EscalationPolicyMutationRequest
   ): Promise<EscalationPolicyDTO> => {
-    const { data } = await escalationApiClient.post('/', payload);
+    const { data } = await escalationApiClient.post('', payload);
     return data;
   },
 

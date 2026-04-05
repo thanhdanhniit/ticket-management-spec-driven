@@ -122,7 +122,7 @@ export default function EditEscalationPolicyModal({ policy, onClose }: Props) {
     const newStepErrors: StepErrors[] = steps.map((step) => {
       const errs: StepErrors = {};
       if (!step.targetId.trim()) {
-        errs.targetId = 'Target UUID is required.';
+        errs.targetId = 'Target Name is required.';
         valid = false;
       }
       if (step.waitTimeMinutes < 0) {
@@ -176,7 +176,7 @@ export default function EditEscalationPolicyModal({ policy, onClose }: Props) {
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       {/* Dialog */}
-      <div className="relative w-full max-w-2xl mx-4 bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
           <h2 className="text-base font-bold text-slate-900">Edit Escalation Policy</h2>

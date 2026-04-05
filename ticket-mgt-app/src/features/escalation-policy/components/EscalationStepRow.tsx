@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import type { EscalationStepRequest } from '../../../types/escalationPolicy';
+import { useUsers } from '../../../hooks/useUsers';
+import { useTeams } from '../../../hooks/useTeams';
 
 interface Props {
   step: EscalationStepRequest;
@@ -29,6 +31,9 @@ export default function EscalationStepRow({
   error,
 }: Props) {
   const stepNumber = index + 1;
+
+  const { data: usersResponse, isLoading: isLoadingUsers } = useUsers({ size: 100 });
+  const { data: teamsResponse, isLoading: isLoadingTeams } = useTeams({ size: 100 });
 
   const handleChange = useCallback(
     <K extends keyof EscalationStepRequest>(key: K, value: EscalationStepRequest[K]) => {
@@ -94,9 +99,13 @@ export default function EscalationStepRow({
           </label>
           <select
             value={step.targetType}
-            onChange={(e) =>
-              handleChange('targetType', e.target.value as 'USER' | 'TEAM')
-            }
+            onChange={(e) => {
+              onChange(index, {
+                ...step,
+                targetType: e.target.value as 'USER' | 'TEAM',
+                targetId: ''
+              });
+            }}
             className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="USER">User</option>
@@ -104,20 +113,38 @@ export default function EscalationStepRow({
           </select>
         </div>
 
-        {/* Target ID */}
+        {/* Target Name */}
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">
-            Target UUID
+            Target Name
           </label>
-          <input
-            type="text"
+          <select
             value={step.targetId}
             onChange={(e) => handleChange('targetId', e.target.value)}
-            placeholder="Enter User or Team UUID"
+            disabled={
+              (step.targetType === 'USER' && isLoadingUsers) ||
+              (step.targetType === 'TEAM' && isLoadingTeams)
+            }
             className={`w-full border rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               error?.targetId ? 'border-red-400' : 'border-slate-200'
             }`}
-          />
+          >
+            <option value="" disabled>
+              Select {step.targetType === 'USER' ? 'User' : 'Team'}
+            </option>
+            {step.targetType === 'USER' &&
+              usersResponse?.content?.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.fullName} ({user.email})
+                </option>
+              ))}
+            {step.targetType === 'TEAM' &&
+              teamsResponse?.content?.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+          </select>
           {error?.targetId && (
             <p className="text-xs text-red-500 mt-1">{error.targetId}</p>
           )}

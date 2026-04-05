@@ -1,0 +1,171 @@
+{
+  "page": {
+    "name": "Add/Update Tags",
+    "layout": "Modal / Slide-out Drawer overlay",
+    "sections": [
+      {
+        "id": "modal-header",
+        "type": "header",
+        "components": [
+          {
+            "id": "modal-title",
+            "type": "typography",
+            "label": "Add/Update Tags",
+            "properties": {
+              "variant": "h1"
+            }
+          },
+          {
+            "id": "close-icon",
+            "type": "icon-button",
+            "label": "",
+            "properties": {
+              "icon": "cross/X"
+            }
+          }
+        ]
+      },
+      {
+        "id": "tags-management-form",
+        "type": "form",
+        "components": [
+          {
+            "id": "labels",
+            "type": "header-row",
+            "components": [
+              { "type": "typography", "label": "Key" },
+              { "type": "typography", "label": "Value" }
+            ]
+          },
+          {
+            "id": "tag-row-1",
+            "type": "row",
+            "components": [
+              {
+                "id": "tag-key-1",
+                "type": "select",
+                "label": "prioirty",
+                "properties": {
+                  "value": "prioirty"
+                }
+              },
+              {
+                "id": "tag-value-1",
+                "type": "select",
+                "label": "high",
+                "properties": {
+                  "value": "high"
+                }
+              },
+              {
+                "id": "status-dot-1",
+                "type": "indicator",
+                "properties": {
+                  "color": "green"
+                }
+              },
+              {
+                "id": "remove-tag-1",
+                "type": "icon-button",
+                "label": "",
+                "properties": {
+                  "icon": "cross/X"
+                }
+              }
+            ]
+          },
+          {
+            "id": "tag-row-2",
+            "type": "row",
+            "components": [
+              {
+                "id": "tag-key-2",
+                "type": "select",
+                "label": "impact",
+                "properties": {
+                  "value": "impact"
+                }
+              },
+              {
+                "id": "tag-value-2",
+                "type": "select",
+                "label": "widespead",
+                "properties": {
+                  "value": "widespead"
+                }
+              },
+              {
+                "id": "status-dot-2",
+                "type": "indicator",
+                "properties": {
+                  "color": "green"
+                }
+              },
+              {
+                "id": "remove-tag-2",
+                "type": "icon-button",
+                "label": "",
+                "properties": {
+                  "icon": "cross/X"
+                }
+              }
+            ]
+          },
+          {
+            "id": "tag-row-3-editing",
+            "type": "row",
+            "components": [
+              {
+                "id": "tag-key-3",
+                "type": "select",
+                "label": "Key",
+                "properties": {
+                  "placeholder": "Key"
+                }
+              },
+              {
+                "id": "tag-value-3-input",
+                "type": "autocomplete-input",
+                "label": "Value",
+                "properties": {
+                  "value": "whole",
+                  "suggestion": "+ whole"
+                }
+              }
+            ]
+          },
+          {
+            "id": "add-tag-action",
+            "type": "button",
+            "label": "Add Tag",
+            "properties": {
+              "variant": "ghost/link"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modal-actions",
+        "type": "toolbar",
+        "components": [
+          {
+            "id": "update-button",
+            "type": "button",
+            "label": "Update Tag(s)",
+            "properties": {
+              "variant": "primary"
+            }
+          },
+          {
+            "id": "cancel-button",
+            "type": "button",
+            "label": "Cancel",
+            "properties": {
+              "variant": "outline"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

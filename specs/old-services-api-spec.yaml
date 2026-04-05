@@ -1,0 +1,472 @@
+openapi: 3.0.3
+info:
+  title: Services Management API
+  description: API specification for managing Services, tracking operational metrics, configuring maintenance windows, and organizing metadata. Developed from the Service Management user stories.
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: Main routing API
+
+tags:
+  - name: Services
+    description: Core operations for Service entities
+  - name: Service Configurations
+    description: Operations for granular service settings like Maintenance and Tags
+  - name: Service Analytics
+    description: Read-only paths for aggregated operational data
+
+paths:
+  /services:
+    get:
+      summary: List Services
+      description: Returns a paginated list of services with embedded high-level metrics (MTTA/MTTR) and filtering capabilities natively supporting the Advanced Filter overlays.
+      tags:
+        - Services
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          description: Page number for pagination
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 20
+          description: Number of records per page
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: name,asc
+          description: Sorting field and direction
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Free-text search matching name or description
+        - in: query
+          name: ownerId
+          schema:
+            type: string
+          description: Filter by specific owner ID
+        - in: query
+          name: tags
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter by array of tags
+      responses:
+        '200':
+          description: Successfully retrieved the list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicePaginatedResource'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+    post:
+      summary: Create a New Service
+      description: Registers a new service mapping required relational constraints (Owner, Escalation Policy).
+      tags:
+        - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceCreateRequest'
+      responses:
+        '201':
+          description: Service successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /services/{id}:
+    get:
+      summary: View Service Details
+      description: Retrieves a comprehensive entity structure for a single service, including active status, owner payload, and full 30-day metric cards arrays.
+      tags:
+        - Services
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved service details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceDetail'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+    put:
+      summary: Update Service
+      description: Standard full update for generic service properties.
+      tags:
+        - Services
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceUpdateRequest'
+      responses:
+        '200':
+          description: Service successfully modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+    delete:
+      summary: Delete Service
+      description: Purges a service entity mapped from the Row Action ellipsis menu.
+      tags:
+        - Services
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+      responses:
+        '204':
+          description: Successfully deleted, no content returned
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /services/{id}/tags:
+    put:
+      summary: Quick Update Tags
+      description: Inline context endpoint designed to securely swap arrays of string tag metadata without pushing a complete generalized entity update payload.
+      tags:
+        - Service Configurations
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tags
+              properties:
+                tags:
+                  type: array
+                  description: New array replacing existing tag footprint
+                  items:
+                    type: string
+                    pattern: '^[a-zA-Z0-9_\-\s]+$'
+      responses:
+        '200':
+          description: Tags updated efficiently
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /services/{id}/maintenance:
+    put:
+      summary: Configure Maintenance Mode
+      description: Persists complex chronological arrays outlining operational suppression intervals matching the progressive disclosure overlay.
+      tags:
+        - Service Configurations
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceConfigurationRequest'
+      responses:
+        '200':
+          description: Maintenance schedules properly evaluated and mapped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceConfiguration'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /services/{id}/analytics:
+    get:
+      summary: Fetch Incident Analytics
+      description: Returns stacked aggregations of incidents to plot charts specifically matching Triggered/Acknowledged/Resolved mapping structurally.
+      tags:
+        - Service Analytics
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdPath'
+        - in: query
+          name: timeframe
+          schema:
+            type: string
+            enum: [DAILY, WEEKLY]
+            default: DAILY
+          description: Controls data aggregation intervals matching UI toggle group
+      responses:
+        '200':
+          description: Returns an aggregated dataset mapped for chart visualization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsChartResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  parameters:
+    ServiceIdPath:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Globally unique identifier for the targeted service
+
+  responses:
+    BadRequestError:
+      description: Invalid payload or validation bounds failure (e.g. End Date predates Start Date)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFoundError:
+      description: Requested Entity could not locate (404 Error State mapping)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Backend logic or networking crash rendering Banner/Toast warnings
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+    Service:
+      type: object
+      description: Baseline entity mapping for standard list/nested views
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, MAINTENANCE, NEEDS_ATTENTION, DEPRECATED]
+        owner:
+          $ref: '#/components/schemas/EntityReference'
+        escalationPolicy:
+          $ref: '#/components/schemas/EntityReference'
+        tags:
+          type: array
+          items:
+            type: string
+
+    ServiceDetail:
+      allOf:
+        - $ref: '#/components/schemas/Service'
+        - type: object
+          description: Expanded entity structurally inclusive of deeper metrics matching the View Detail layouts.
+          properties:
+            nextMaintenance:
+              type: string
+            extensions:
+              type: array
+              items:
+                type: string
+            metrics:
+              $ref: '#/components/schemas/ServiceMetrics'
+
+    EntityReference:
+      type: object
+      description: Light structural relation for populating Owner and Escalation metadata logic organically.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    ServiceMetrics:
+      type: object
+      description: 30-day quantitative data logic mapping to UI metric cards natively.
+      properties:
+        openIncidents:
+          type: integer
+        triggeredCount:
+          type: integer
+        acknowledgedCount:
+          type: integer
+        resolvedCount:
+          type: integer
+        mttaHours:
+          type: number
+          format: float
+        mttrHours:
+          type: number
+          format: float
+
+    ServicePaginatedResource:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    ServiceCreateRequest:
+      type: object
+      required:
+        - name
+        - ownerId
+        - escalationPolicyId
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        escalationPolicyId:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+
+    ServiceUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        escalationPolicyId:
+          type: string
+          format: uuid
+
+    MaintenanceWindow:
+      type: object
+      required:
+        - startDate
+        - endDate
+        - recurrence
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+          description: MUST strictly fall chronologically after startDate
+        recurrence:
+          type: string
+          enum: [NEVER, DAY, WEEK, TWO_WEEKS, THREE_WEEKS, ONE_MONTH]
+
+    MaintenanceConfigurationRequest:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+        windows:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaintenanceWindow'
+
+    MaintenanceConfiguration:
+      allOf:
+        - $ref: '#/components/schemas/MaintenanceConfigurationRequest'
+
+    AnalyticsDataPoint:
+      type: object
+      properties:
+        dateLabel:
+          type: string
+        triggered:
+          type: integer
+        acknowledged:
+          type: integer
+        resolved:
+          type: integer
+
+    AnalyticsChartResponse:
+      type: object
+      properties:
+        timeframe:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyticsDataPoint'

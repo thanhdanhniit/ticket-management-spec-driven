@@ -1,0 +1,129 @@
+{
+  "page": {
+    "name": "Filter",
+    "layout": "Slide-out Drawer overlay",
+    "sections": [
+      {
+        "id": "drawer-header",
+        "type": "header",
+        "components": [
+          {
+            "id": "drawer-title",
+            "type": "typography",
+            "label": "Filter",
+            "properties": {
+              "variant": "h1"
+            }
+          },
+          {
+            "id": "close-icon",
+            "type": "icon-button",
+            "label": "",
+            "properties": {
+              "icon": "cross/X"
+            }
+          }
+        ]
+      },
+      {
+        "id": "filter-content",
+        "type": "form",
+        "components": [
+          {
+            "id": "service-owner-filter",
+            "type": "filter-group",
+            "label": "Service Owner",
+            "components": [
+              {
+                "id": "clear-section-action",
+                "type": "button",
+                "label": "Clear",
+                "properties": {
+                  "variant": "ghost/link"
+                }
+              },
+              {
+                "id": "owner-search-combobox",
+                "type": "combobox",
+                "label": "Search for users or squads",
+                "properties": {
+                  "placeholder": "Search for users or squads",
+                  "hasDropdown": true
+                }
+              },
+              {
+                "id": "dropdown-results",
+                "type": "list-group",
+                "label": "YOU & YOUR SQUADS",
+                "components": [
+                  {
+                    "id": "select-all-option",
+                    "type": "list-item",
+                    "label": "Select All",
+                    "properties": {
+                      "interactive": true
+                    }
+                  },
+                  {
+                    "id": "user-michael-nguyen",
+                    "type": "list-item",
+                    "label": "Michael Nguyen (You)",
+                    "properties": {
+                      "secondaryText": "carolynne",
+                      "hasAvatar": true,
+                      "interactive": true
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "active-selection-chips",
+                "type": "chip-group",
+                "components": [
+                  {
+                    "id": "chip-michael-nguyen",
+                    "type": "chip",
+                    "label": "Michael Nguyen (You) (carolyni",
+                    "properties": {
+                      "closable": true
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "drawer-footer",
+        "type": "toolbar",
+        "components": [
+          {
+            "id": "apply-filters-button",
+            "type": "button",
+            "label": "Apply",
+            "properties": {
+              "variant": "primary"
+            }
+          },
+          {
+            "id": "cancel-button",
+            "type": "button",
+            "label": "Cancel",
+            "properties": {
+              "variant": "outline"
+            }
+          },
+          {
+            "id": "clear-all-filters-action",
+            "type": "button",
+            "label": "Clear all filters",
+            "properties": {
+              "variant": "ghost/link"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

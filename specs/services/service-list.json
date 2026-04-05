@@ -1,0 +1,187 @@
+{
+  "page": {
+    "name": "Services",
+    "layout": "Sidebar Layout with Header and Content Area",
+    "sections": [
+      {
+        "id": "top-banner",
+        "type": "banner",
+        "components": [
+          {
+            "id": "verify-phone-alert",
+            "type": "alert",
+            "label": "Verify your Phone Number to enable Phone and SMS notifications",
+            "properties": {
+              "variant": "info",
+              "hasCloseButton": true
+            }
+          }
+        ]
+      },
+      {
+        "id": "header",
+        "type": "header",
+        "components": [
+          {
+            "id": "page-title",
+            "type": "typography",
+            "label": "Services",
+            "properties": {
+              "variant": "h1"
+            }
+          },
+          {
+            "id": "page-description",
+            "type": "typography",
+            "label": "Services are logical units of your product/service and are mapped to alert sources. Choose from the Catalog and Graph view to understand your services, health metrics and their dependencies in detail. Read More",
+            "properties": {
+              "variant": "body"
+            }
+          },
+          {
+            "id": "search-button",
+            "type": "button",
+            "label": "",
+            "properties": {
+              "icon": "search",
+              "variant": "outline"
+            }
+          },
+          {
+            "id": "filter-button",
+            "type": "button",
+            "label": "",
+            "properties": {
+              "icon": "filter",
+              "variant": "outline"
+            }
+          },
+          {
+            "id": "add-new-service-button",
+            "type": "button",
+            "label": "Add New Service",
+            "properties": {
+              "variant": "primary"
+            }
+          }
+        ]
+      },
+      {
+        "id": "navigation-tabs",
+        "type": "tabs",
+        "components": [
+          {
+            "id": "overview-tab",
+            "type": "tab",
+            "label": "Overview",
+            "properties": {
+              "active": true
+            }
+          },
+          {
+            "id": "graph-tab",
+            "type": "tab",
+            "label": "Graph",
+            "properties": {
+              "active": false
+            }
+          }
+        ]
+      },
+      {
+        "id": "list-controls",
+        "type": "toolbar",
+        "components": [
+          {
+            "id": "showing-count",
+            "type": "typography",
+            "label": "Showing 2 of 2",
+            "properties": {}
+          },
+          {
+            "id": "view-toggle",
+            "type": "button-group",
+            "label": "",
+            "properties": {
+              "options": [
+                "grid",
+                "list"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "services-table",
+        "type": "table",
+        "components": [
+          {
+            "id": "table-columns",
+            "type": "table-header",
+            "label": "",
+            "properties": {
+              "columns": [
+                "Selection",
+                "NAME",
+                "ALERT SOURCE",
+                "OWNER & ESCALATION POLICY",
+                "OPEN INCIDENTS (LAST 30 DAYS)",
+                "MTTA (LAST 30 DAYS)",
+                "MTTR (LAST 30 DAYS)",
+                "STATUS"
+              ]
+            }
+          },
+          {
+            "id": "service-row-1",
+            "type": "table-row",
+            "label": "Example Service",
+            "properties": {
+              "name": "Example Service",
+              "owner": "Michael Nguyen",
+              "policy": "Example Escalat...",
+              "incidents": "0 Triggered 0 Acknowledged",
+              "mtta": "21.98 min",
+              "mttr": "27.22 hr",
+              "status": "Healthy"
+            }
+          },
+          {
+            "id": "service-row-2",
+            "type": "table-row",
+            "label": "Payment Service",
+            "properties": {
+              "name": "Payment Service",
+              "tags": [
+                "prioirty: high",
+                "impact: widespead"
+              ],
+              "owner": "Michael Nguyen",
+              "policy": "Payment Escalat...",
+              "incidents": "0 Triggered 0 Acknowledged",
+              "mtta": "0 sec",
+              "actions": [
+                "Maintenance Mode",
+                "Update Tag(s)"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "pagination",
+        "type": "pagination",
+        "components": [
+          {
+            "id": "rows-per-page-dropdown",
+            "type": "select",
+            "label": "Show rows per page",
+            "properties": {
+              "value": "10"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

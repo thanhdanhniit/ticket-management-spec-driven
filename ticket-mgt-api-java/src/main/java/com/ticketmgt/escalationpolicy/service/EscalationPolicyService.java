@@ -142,20 +142,28 @@ public class EscalationPolicyService {
                         "Escalation policy not found with id: " + id));
     }
 
-    /**
-     * Converts the step requests into ordered EscalationStep entities.
-     * Auto-assigns step_order (1-based) based on request array position.
-     */
     private List<EscalationStep> buildSteps(EscalationPolicyMutationRequest request, EscalationPolicy policy) {
         AtomicInteger order = new AtomicInteger(1);
         return request.getSteps().stream()
-                .map(stepRequest -> EscalationStep.builder()
+                .map(stepRequest -> {
+                    if ("USER".equalsIgnoreCase(stepRequest.getTargetType())) {
+                        if (!userRepository.existsById(stepRequest.getTargetId())) {
+                            throw new ResourceNotFoundException("User target not found: " + stepRequest.getTargetId());
+                        }
+                    } else if ("TEAM".equalsIgnoreCase(stepRequest.getTargetType())) {
+                        if (!teamRepository.existsById(stepRequest.getTargetId())) {
+                            throw new ResourceNotFoundException("Team target not found: " + stepRequest.getTargetId());
+                        }
+                    }
+
+                    return EscalationStep.builder()
                         .policy(policy)
                         .stepOrder(order.getAndIncrement())
                         .waitTimeMinutes(stepRequest.getWaitTimeMinutes())
                         .targetId(stepRequest.getTargetId())
                         .targetType(EscalationStep.TargetType.valueOf(stepRequest.getTargetType().toUpperCase()))
-                        .build())
+                        .build();
+                })
                 .toList();
     }
 

@@ -42,13 +42,13 @@ export default function EscalationPolicyRow({ policy, onEdit }: Props) {
       <div className="p-5 border-b border-slate-100 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 
+            <h3
               className="text-lg font-bold text-slate-900 cursor-pointer hover:underline decoration-2 underline-offset-4 decoration-blue-600 transition-all cursor-pointer"
               onClick={() => onEdit(policy)}
             >
               {policy.name}
             </h3>
-            
+
             {/* Mock tags representing Associated Services and Users as per design */}
             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-medium text-slate-600">
               <FileText size={12} className="text-slate-400" />
@@ -101,7 +101,7 @@ export default function EscalationPolicyRow({ policy, onEdit }: Props) {
             )}
           </div>
         </div>
-        
+
         {/* Description subheader */}
         <p className="text-sm text-slate-500">
           {policy.description || 'No description provided.'}
@@ -109,30 +109,30 @@ export default function EscalationPolicyRow({ policy, onEdit }: Props) {
       </div>
 
       {/* ── Escalation Steps List ── */}
-      <div className="bg-slate-50 flex flex-col">
+      <div className="bg-slate-50 bg-white flex flex-col">
         {policy.steps.map((step, index) => (
           <div key={step.id} className="grid grid-cols-[1fr_1fr_auto] md:grid-cols-[180px_1fr_auto] gap-4 items-center px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/80 transition-colors">
-            
+
             <div className="text-sm font-medium text-slate-700 flex items-center gap-2">
-               {index > 0 && (
-                 <div className="flex flex-col items-center justify-center mr-1">
-                   {/* Vertical line / arrow visualizer could go here */}
-                 </div>
-               )}
-               {step.waitTimeMinutes === 0 ? 'Immediately' : `Escalate after ${step.waitTimeMinutes} minute${step.waitTimeMinutes > 1 ? 's' : ''}`}
+              {index > 0 && (
+                <div className="flex flex-col items-center justify-center mr-1">
+                  {/* Vertical line / arrow visualizer could go here */}
+                </div>
+              )}
+              {step.waitTimeMinutes === 0 ? 'Immediately' : `Escalate after ${step.waitTimeMinutes} minute${step.waitTimeMinutes > 1 ? 's' : ''}`}
             </div>
-            
+
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium bg-white border border-slate-200 text-slate-600 shadow-sm">
-                {step.targetType === 'USER' ? <User size={14} className="text-slate-400"/> : <Users size={14} className="text-slate-400"/>}
+                {step.targetType === 'USER' ? <User size={14} className="text-slate-400" /> : <Users size={14} className="text-slate-400" />}
                 {step.targetType === 'USER' ? 'User' : 'Team'}: {step.targetName || step.targetId.split('-')[0]}
               </span>
             </div>
-            
+
             <div>
-               <span className="inline-flex items-center px-3 py-1.5 rounded-md bg-slate-100/80 border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer whitespace-nowrap">
-                 Personal Notification Rules
-               </span>
+              <span className="inline-flex items-center px-3 py-1.5 rounded-md bg-slate-100/80 border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer whitespace-nowrap">
+                Personal Notification Rules
+              </span>
             </div>
           </div>
         ))}
@@ -175,8 +175,8 @@ export default function EscalationPolicyRow({ policy, onEdit }: Props) {
         <div className="px-5 py-3 bg-red-50 border-t border-red-200 flex items-start gap-3 text-sm text-red-800">
           <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
           <span className="flex-1 font-medium">{deleteError}</span>
-          <button 
-            onClick={() => setDeleteError(null)} 
+          <button
+            onClick={() => setDeleteError(null)}
             className="text-red-400 hover:text-red-700 shrink-0 p-1 hover:bg-red-100 rounded-md transition-colors"
           >
             <X size={16} />

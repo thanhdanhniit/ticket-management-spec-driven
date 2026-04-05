@@ -21,13 +21,17 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle 401 globally
+// Response interceptor — handle 401 and 403 globally
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+    const status = error.response?.status;
+    if (status === 401 || status === 403) {
+      if (localStorage.getItem('auth_token')) {
+        localStorage.removeItem('auth_token');
+        alert('Your login session has expired. Please log in again.');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

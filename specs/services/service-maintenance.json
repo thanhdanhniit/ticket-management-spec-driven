@@ -1,0 +1,172 @@
+{
+  "page": {
+    "name": "Maintenance Mode",
+    "layout": "Modal / Slide-out Drawer overlay",
+    "sections": [
+      {
+        "id": "modal-header",
+        "type": "header",
+        "components": [
+          {
+            "id": "modal-title",
+            "type": "typography",
+            "label": "Maintenance Mode",
+            "properties": {
+              "variant": "h1"
+            }
+          },
+          {
+            "id": "close-icon",
+            "type": "icon-button",
+            "label": "",
+            "properties": {
+              "icon": "cross/X"
+            }
+          }
+        ]
+      },
+      {
+        "id": "selections",
+        "type": "info-group",
+        "components": [
+          {
+            "id": "services-selected-label",
+            "type": "typography",
+            "label": "Service(s) Selected:",
+            "properties": {
+              "style": "bold"
+            }
+          },
+          {
+            "id": "service-tag",
+            "type": "tag",
+            "label": "PAYMENT SERVICE",
+            "properties": {
+              "variant": "outline"
+            }
+          }
+        ]
+      },
+      {
+        "id": "toggle-section",
+        "type": "control-row",
+        "components": [
+          {
+            "id": "enable-maintenance-switch",
+            "type": "switch",
+            "label": "Enable maintenance for service(s)",
+            "properties": {
+              "checked": false
+            }
+          }
+        ]
+      },
+      {
+        "id": "maintenance-config-content",
+        "type": "content-container",
+        "components": [
+          {
+            "id": "disabled-state-view",
+            "type": "placeholder",
+            "label": "Enable maintenance for the selected service(s)",
+            "properties": {
+              "display": "if switch is off",
+              "hasIllustration": true
+            }
+          },
+          {
+            "id": "maintenance-schedule-card",
+            "type": "form-card",
+            "label": "New Maintenance Schedule",
+            "properties": {
+              "display": "if switch is on"
+            },
+            "components": [
+              {
+                "id": "start-date-input",
+                "type": "date-picker",
+                "label": "Start Date *",
+                "properties": {
+                  "required": true
+                }
+              },
+              {
+                "id": "start-time-select",
+                "type": "select-input",
+                "label": "Start Time *",
+                "properties": {
+                  "required": true
+                }
+              },
+              {
+                "id": "end-date-input",
+                "type": "date-picker",
+                "label": "End Date",
+                "properties": {
+                  "required": false
+                }
+              },
+              {
+                "id": "end-time-select",
+                "type": "select-input",
+                "label": "End Time",
+                "properties": {
+                  "required": false
+                }
+              },
+              {
+                "id": "repeats-select",
+                "type": "select-input",
+                "label": "Repeats every *",
+                "properties": {
+                  "required": true,
+                  "defaultValue": "Never"
+                }
+              },
+              {
+                "id": "delete-schedule-action",
+                "type": "icon-button",
+                "label": "",
+                "properties": {
+                  "icon": "trash/delete",
+                  "variant": "danger-outline"
+                }
+              }
+            ]
+          },
+          {
+            "id": "add-window-action",
+            "type": "button",
+            "label": "Add New Maintenance Window",
+            "properties": {
+              "variant": "ghost/link",
+              "display": "if switch is on"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modal-actions",
+        "type": "toolbar",
+        "components": [
+          {
+            "id": "save-maintenance-button",
+            "type": "button",
+            "label": "Save",
+            "properties": {
+              "variant": "primary"
+            }
+          },
+          {
+            "id": "cancel-button",
+            "type": "button",
+            "label": "Cancel",
+            "properties": {
+              "variant": "outline"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,61 +1,67 @@
-# Add New Service Page
+# Define Service Page
 
 ## Purpose
-To provide administrators and system managers a dedicated interface to create and configure a new service entity within the application.
+The Define Service page provides a form-based interface allowing users to create a new service and subsequently attach alert source integrations. It acts as the required configuration step to begin receiving incidents.
 
 ## Layout
-- **Global Sidebar**: Standard global sidebar on the left for main application navigation. Reference: [`shared_global_sidebar_ui_spec.md`](../shared_global_sidebar_ui_spec.md).
-- **Top Navigation Bar**: Standard top header covering global actions. Reference: [`shared_top_navigation_bar_ui_spec.md`](../shared_top_navigation_bar_ui_spec.md).
-- **Main Content Area**:
-    - **Page Header**: Displays the page title "Add New Service" and potentially breadcrumbs.
-    - **Form Container**: A structured block or card layout containing the inputs necessary to create the service.
-    - **Form Footer**: Horizontal layout housing the primary "Save" or "Create Service" button, alongside a "Cancel" button.
-- **Page Context**: Navigated to from the Service List. Reference: [`service_list_ui_spec.md`](service_list_ui_spec.md).
+The page is organized using a Sidebar Layout consisting of a primary Header, a central Content Area containing the form, and a Right Help Sidebar:
+- **Header**: Contains the page title, a brief description
+- **Content Area (Form)**: The main vertical flow containing input fields required for service definition.
+- **Footer Toolbar**: Positioned at the bottom of the form section, anchoring the primary submission and cancellation actions.
+- **Right Help Sidebar**: A static panel on the right side ("Help and Guide") offering contextual definitions and documentation links pertinent to the form's fields.
+
+## Shared Components
+- **Global Sidebar**: For standard navigation between application modules, refer to [shared_global_sidebar_ui_spec.md](../../specs/shared_global_sidebar_ui_spec.md).
+- **Top Navigation Bar**: For global utility functions, team switching, and search, refer to [shared_top_navigation_bar_ui_spec.md](../../specs/shared_top_navigation_bar_ui_spec.md).
 
 ## Components
-- Page Header / Title
-- Standard Text Inputs
-- Searchable Dropdown / Autocomplete Input components (for relational data like Owner and Escalation Policy)
-- Primary and Secondary Action Buttons
+- **Typography Title (H1)**: Displays the large page title ("Define Service").
+- **Typography Subtitle**: Provides instructional context below the title.
+- **Readonly Input**: Displays disabled context information, such as the pre-selected "Team Name".
+- **Text Input**: Standard single-line input field used for text entry (e.g., "Service Name").
+- **Textarea**: Larger multi-line input field designed for extended explanatory text.
+- **Select Dropdown**: Interactive dropdown menu opening a list of predefined selectable options (e.g., for Policies, Owners).
+- **Dynamic List**: A composite structural block enabling users to add or remove identical rows of inputs (used for the Tags section).
+- **Icon Button**: A minimalist button represented purely by an icon (e.g., the 'X' to remove a list row).
+- **Ghost/Link Button**: Text styled to resemble a hyperlink acting as a local action trigger ("Add Tag").
+- **Primary Button**: The visually prominent "Save" button driving the primary workflow.
+- **Outline Button**: The visually subdued "Cancel" button.
+- **Help Section**: A stylized sidebar block displaying FAQ-style headings paired with informational text and "Read More" links.
 
 ## Fields
-- **Name**: Mandatory text input field for the service's primary identifier.
-- **Description**: Optional text area field for elaboration on the service's purpose.
-- **Escalation Policy**: A mandatory searchable dropdown constraint. As the user types into the input, it dynamically filters and displays matched policies in a list below (e.g., "Example Escalation Policy", "Payment Escalate Policy"). 
-- **Owner**: A mandatory searchable dropdown constraint. Typing in the input filters and locates matched owner identities (users or teams). Displays relevant metadata in the dropdown (e.g., Avatar, User Full Name like "Michael Nguyen", and secondary identifier).
-- **Tags**: Optional multi-select attribute field.
+- **Team Name**: (Readonly) Indicates the active team context under which the service is being generated (e.g., "Default Team").
+- **Service Name**: (Required Text Input) The user-defined identifier for the new service.
+- **Service Description**: (Textarea) An optional field allowing users to provide a detailed overview of the service's function.
+- **Escalation Policy**: (Required Select) The routing policy assigned to receive incidents for this service.
+- **Owner**: (Required Select) The individual user or team defined as the principal maintainer of the service.
+- **Tags**: A repetitive key-value section used for operational metadata.
+    - **Key**: (Select) The categorization label.
+    - **Value**: (Select) The corresponding data assigned to the key.
 
 ## User Actions
-- **Input Text Attributes**: User focuses and types into the Name and Description fields.
-- **Search & Select Escalation Policy**: 
-  - User clicks the input to open the dropdown and types a query.
-  - User selects a matched policy from the flyout menu by clicking it. The flyout collapses, and the selected policy string populates the input.
-- **Search & Select Owner**: 
-  - User clicks the input and types a query (e.g., "Michael").
-  - The UI updates to show matching users. The user clicks the targeted user block, collapsing the menu and populating the selection.
-- **Submit Form**: Clicking the primary action button authenticates required fields and sends the data payload to the server.
-- **Cancel**: Clicking the "Cancel" button discards the in-progress form and routes the user back to the Service List view.
+- **Type Service Details**: Entering characters into the "Service Name" and "Service Description" text fields.
+- **Select Policy/Owner**: Expanding dropdowns and picking values to satisfy the Escalation Policy and Owner requirements.
+- **Add Tag**: Clicking the "Add Tag" link button to insert a new, empty Key-Value row into the Tags list.
+- **Configure Tags**: Using the dropdown inputs within a tag row to specify classifications.
+- **Remove Tag Row**: Clicking the specialized 'X' icon button on a given tag row to delete that specific key-value pair from the list.
+- **Access Documentation**: Clicking "Read More" within the Help and Guide sidebar to open detailed documentation (likely in a new tab or slide-out drawer).
+- **Submit Form**: Clicking the "Save" button to validate the form inputs and invoke API call to create the service.
+- **Cancel Process**: Clicking "Cancel" to abandon all input and navigate back to the previous screen (e.g., the Services List).
 
 ## Forms
-- **Add Service Form**: A comprehensive validation-wrapped structural form determining the creation payload for the `/services` API endpoint.
+**Define Service Form:**
+The central form orchestrates the collection of Service entity data. It enforces `required` validation logic specifically on the "Service Name", "Escalation Policy", and "Owner" fields while managing the state for the dynamic list of custom Tags.
 
 ## Tables
-N/A
+*No tabular data components are utilized on this specific view.*
 
 ## Pagination / Filters
-N/A
+*No list controls, pagination elements, or structural filters are present on this form view.*
 
 ## Navigation
-- **From Service List**: Triggered by the "Add New Service" button on the Services List.
-- **On Submit Success**: Redirects the user sequentially either to the newly created `Service Details` page or back to the `Services List`.
-- **On Cancel**: Re-routes via history back to the `Services List`.
+- **Form Actions**: The form controls serve as localized navigation. "Cancel" retreats to the parent list context. "Save" validates state and save the service.
+- *(Global and top-level navigation relies on the shared sidebar and header).*
 
 ## Error / Empty States
-- **Validation Blocks**: Providing no input to mandatory fields (marked usually by a red asterisk `*` like Escalation Policy and Owner) will flag the fields in red with an inline error message (e.g., "This field is required") upon submission or blur.
-- **Empty Search Matches**: If a typed search within the Escalation Policy or Owner dropdowns yields no results, render a discrete inline label specifying "No matches found." inside the dropdown box.
-- **API Error Warning**: If the submit action fails due to network or server issues, present a dismissible error toast or banner informing the user of the failure so they don't lose typed data.
-
-## Guidelines
-- Use clear and concise descriptions.
-- Focus exclusively on UI behavior and interactions.
-- Provide real-time autocomplete debounce logic and feedback as the user types in the searchable dropdowns.
+- **Validation Error (Inferred)**: Interacting with "Save" while required fields remain incomplete should prevent navigation. The interface should highlight the missing fields with an error boundary (e.g., red outline) and display localized help text (e.g., "This field is required").
+- **Submission Error (Inferred)**: If the backend fails to process the valid form (e.g., network timeout, duplicate service name conflict), an alert bar or toast notification should emerge conveying the exact reason for failure.
