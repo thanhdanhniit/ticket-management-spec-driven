@@ -1,4 +1,4 @@
-package com.ticketmgt.settings.security;
+package com.ticketmgt.shared.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

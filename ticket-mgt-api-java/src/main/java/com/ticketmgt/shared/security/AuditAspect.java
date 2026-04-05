@@ -1,4 +1,4 @@
-package com.ticketmgt.settings.security;
+package com.ticketmgt.shared.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketmgt.settings.entity.AuditLog;

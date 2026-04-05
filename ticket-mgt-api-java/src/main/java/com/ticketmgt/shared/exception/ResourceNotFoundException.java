@@ -1,4 +1,4 @@
-package com.ticketmgt.settings.exception;
+package com.ticketmgt.shared.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

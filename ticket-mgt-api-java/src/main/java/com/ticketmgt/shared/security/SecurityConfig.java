@@ -1,4 +1,4 @@
-package com.ticketmgt.settings.security;
+package com.ticketmgt.shared.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

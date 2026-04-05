@@ -1,4 +1,4 @@
-package com.ticketmgt.settings.security;
+package com.ticketmgt.shared.security;
 
 import com.ticketmgt.settings.dto.EntityPermissionMatrix;
 import com.ticketmgt.settings.entity.TeamMember;

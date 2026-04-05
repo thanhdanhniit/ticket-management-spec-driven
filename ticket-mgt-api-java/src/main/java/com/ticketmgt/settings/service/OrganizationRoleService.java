@@ -3,7 +3,7 @@ package com.ticketmgt.settings.service;
 import com.ticketmgt.settings.dto.OrganizationRoleDTO;
 import com.ticketmgt.settings.dto.UpdateOrganizationRoleRequest;
 import com.ticketmgt.settings.entity.OrganizationRole;
-import com.ticketmgt.settings.exception.ResourceNotFoundException;
+import com.ticketmgt.shared.exception.ResourceNotFoundException;
 import com.ticketmgt.settings.mapper.JsonMapper;
 import com.ticketmgt.settings.mapper.OrganizationRoleMapper;
 import com.ticketmgt.settings.repository.OrganizationRoleRepository;

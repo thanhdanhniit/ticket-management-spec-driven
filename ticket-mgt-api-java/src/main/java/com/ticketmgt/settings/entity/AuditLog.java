@@ -17,7 +17,8 @@ import java.util.UUID;
 @Builder
 public class AuditLog {
 
-    // Note: Audit logs are immutable and don't strictly need updated_at, so we avoid BaseEntity
+    // Note: Audit logs are immutable and don't strictly need updated_at, so we
+    // avoid BaseEntity
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

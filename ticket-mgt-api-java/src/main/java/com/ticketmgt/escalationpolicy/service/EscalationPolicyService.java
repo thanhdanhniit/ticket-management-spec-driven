@@ -8,7 +8,7 @@ import com.ticketmgt.escalationpolicy.entity.EscalationStep;
 import com.ticketmgt.escalationpolicy.mapper.EscalationPolicyMapper;
 import com.ticketmgt.escalationpolicy.repository.EscalationPolicyRepository;
 import com.ticketmgt.escalationpolicy.repository.EscalationStepRepository;
-import com.ticketmgt.settings.exception.ResourceNotFoundException;
+import com.ticketmgt.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

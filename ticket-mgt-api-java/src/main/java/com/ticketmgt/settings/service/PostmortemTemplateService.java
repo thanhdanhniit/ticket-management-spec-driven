@@ -3,7 +3,7 @@ package com.ticketmgt.settings.service;
 import com.ticketmgt.settings.dto.CreateTemplateRequest;
 import com.ticketmgt.settings.dto.PostmortemTemplateDTO;
 import com.ticketmgt.settings.entity.PostmortemTemplate;
-import com.ticketmgt.settings.exception.ResourceNotFoundException;
+import com.ticketmgt.shared.exception.ResourceNotFoundException;
 import com.ticketmgt.settings.mapper.PostmortemTemplateMapper;
 import com.ticketmgt.settings.repository.PostmortemTemplateRepository;
 import lombok.RequiredArgsConstructor;

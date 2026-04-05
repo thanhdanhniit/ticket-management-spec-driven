@@ -1,8 +1,8 @@
 package com.ticketmgt.escalationpolicy.exception;
 
 import com.ticketmgt.settings.dto.StandardErrorResponse;
-import com.ticketmgt.settings.exception.BadRequestException;
-import com.ticketmgt.settings.exception.ResourceNotFoundException;
+import com.ticketmgt.shared.exception.BadRequestException;
+import com.ticketmgt.shared.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
