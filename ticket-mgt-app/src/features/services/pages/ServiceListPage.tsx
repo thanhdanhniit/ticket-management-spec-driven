@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { Search, Filter, Plus, List, Grid, AlertCircle, RefreshCw, RotateCcw, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Filter, Plus, List, Grid, AlertCircle, RefreshCw, RotateCcw } from 'lucide-react';
 import { useServices } from '../hooks/useServices';
 import ServiceTable from '../components/ServiceTable';
 import type { ServiceResponse, GetServicesParams } from '../types';
@@ -60,8 +61,9 @@ function ViewToggle({
  *   6. Pagination — page size selector + prev/next
  */
 export default function ServiceListPage() {
+  const navigate = useNavigate();
   // ── UI State ──
-  const [showBanner, setShowBanner] = useState(true);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -220,6 +222,7 @@ export default function ServiceListPage() {
 
             <button
               id="add-new-service-btn"
+              onClick={() => navigate('/services/new')}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm shrink-0 whitespace-nowrap"
             >
               <Plus size={16} />

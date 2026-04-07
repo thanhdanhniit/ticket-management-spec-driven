@@ -6,7 +6,6 @@ import {
 } from '@tanstack/react-table';
 import type { ServiceResponse } from '../types';
 import ServiceStatusBadge from './ServiceStatusBadge';
-import ServiceTagBadge from './ServiceTagBadge';
 import ServiceOwnerCell from './ServiceOwnerCell';
 import ServiceAlertSourceCell from './ServiceAlertSourceCell';
 import {
