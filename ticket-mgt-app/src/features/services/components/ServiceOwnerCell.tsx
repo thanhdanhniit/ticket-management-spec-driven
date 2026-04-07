@@ -1,5 +1,7 @@
 import { Shield } from 'lucide-react';
 import type { OwnerSummary, PolicySummary } from '../types';
+import { useUsers } from '../../../hooks/useUsers';
+import { useEscalationPolicies } from '../../../hooks/useEscalationPolicies';
 
 interface Props {
   owner?: OwnerSummary;
@@ -22,27 +24,33 @@ function OwnerAvatar({ name }: { name: string }) {
 }
 
 export default function ServiceOwnerCell({ owner, escalationPolicy }: Props) {
+  const { data: usersData } = useUsers({ size: 100 });
+  const { data: policiesData } = useEscalationPolicies({ size: 100 });
+
+  const ownerName = owner?.name || (owner?.id ? usersData?.content?.find((u: any) => u.id === owner.id)?.fullName : undefined);
+  const policyName = escalationPolicy?.name || (escalationPolicy?.id ? policiesData?.content?.find((p: any) => p.id === escalationPolicy.id)?.name : undefined);
+
   return (
     <div className="flex flex-col gap-1.5">
-      {owner?.name ? (
+      {ownerName ? (
         <div className="flex items-center gap-2">
-          <OwnerAvatar name={owner.name} />
+          <OwnerAvatar name={ownerName} />
           <span className="text-sm text-slate-700 font-medium truncate max-w-[140px]">
-            {owner.name}
+            {ownerName}
           </span>
         </div>
       ) : (
         <span className="text-sm text-slate-400 italic">No owner</span>
       )}
 
-      {escalationPolicy?.name ? (
+      {policyName ? (
         <div className="flex items-center gap-2 pl-0.5">
           <Shield size={14} className="text-slate-400 shrink-0" />
           <span
             className="text-xs text-blue-600 hover:text-blue-700 cursor-pointer truncate max-w-[140px]"
-            title={escalationPolicy.name}
+            title={policyName}
           >
-            {escalationPolicy.name}
+            {policyName}
           </span>
         </div>
       ) : (

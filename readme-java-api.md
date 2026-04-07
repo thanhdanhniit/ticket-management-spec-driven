@@ -1,7 +1,11 @@
 # What We Are Building
 Screenshots
       ↓
-User Stories + UI Specs
+UI structure JSON
+      ↓
+UI Specs
+      ↓
+User Stories
       ↓
 OpenAPI Spec
       ↓
@@ -9,9 +13,9 @@ DB Design and Architecture
       ↓
 AI Code Generation
       ↓
-Spring Boot Services
-      ↓
 Docker Deployment
+      ↓
+Postman API Collections
 
 # Generate Code in Stages
 
@@ -22,20 +26,10 @@ Domain Layer
 Application Layer (Business Logic + API Layer)
    ↓
 Cross-Cutting Concerns
-
-# Design
-Using the JavaBackendArchitect skill, analyze specs/escalation-policies-api-spec.yaml, the UI specs in specs/escalation-policy/, and the user stories in docs/escalation-policy/.
-
-Suggest the Java Spring Boot architecture and Database Design for the Escalation Policies module. Please provide:
-- ER Diagram/Schema Design: Define JPA entities, relationships (One-to-Many for Maintenance Windows, Many-to-One for Owners/Policies), and data types.
-- Escalation Execution Engine: Explain how to handle the escalation execution engine logic.
-- Timer & Scheduling Strategy: Escalation depends heavily on accurate timers.
-- Incident State Synchronization: Escalation must always check the latest incident state.
-- Concurrency & Race Conditions: Escalation policies run in parallel with incident updates.
-
--- for maintenance mode
-- Concurrency & Logic: Explain how to handle the Maintenance Mode recurrence logic and calculation of MTTR/MTTA stats.
-
+   ↓
+Unit Tests
+   ↓
+Postman API Collections
 
 # Code genration steps
 ## Step 0 — Project Skeleton (optional)
@@ -52,42 +46,119 @@ Include:
 ```
 
 ## Step 1 — Domain Layer
+**Model**: Gemini 3.1 Pro High / Claude Sonnet
+
 Purpose: generate persistence + DTO foundation.
 
 Prompt:
 ```
-Generate the domain layer for escalation-policy domain, following the JavaBackendArchitect skill.
-Create all required entities, repositories, DTOs, and MapStruct mappers based on the OpenAPI specification: specs/escalation-policies-api-spec.yaml
+Use the JavaBackendArchitect skill.
+
+Generate the Domain Layer for the services domain.
+
+Inputs:
+- OpenAPI specification: specs/services-api-spec.yaml
+- Backend design document: docs/technical-design/services_backend_design.md
+
+Tasks:
+- Generate JPA entities based on API schemas
+- Create repositories using Spring Data JPA
+- Generate DTOs that match the OpenAPI schemas
+- Generate MapStruct mappers for DTO ↔ Entity mapping
+
+Output:
+Domain entities, repositories, DTOs, and mapper interfaces.
 ```
 
 ## Step 2 — Application Layer
+**Model**: Gemini 3.1 Pro High / Claude Sonnet
+
 Purpose: generate controllers and services together.
 
 Prompt:
 ```
-Using api-spec specs/escalation-policies-api-spec.yaml and user stories docs/escalation-policy/*.md, generate the application layer for escalation-policy domain following the JavaBackendArchitect skill.
-Implement business workflows from the user stories and expose the REST endpoints defined in the OpenAPI specification.
+Use the JavaBackendArchitect skill.
+
+Generate the Application Layer for the services domain.
+
+Inputs:
+- OpenAPI specification: specs/services-api-spec.yaml
+- Backend design document: docs/technical-design/services_backend_design.md
+- User stories: docs/services/*_user_stories.md
+- Domain layer implementation
+
+Tasks:
+- Implement service classes containing business logic derived from user stories
+- Implement REST controllers that expose endpoints defined in the OpenAPI specification
+- Ensure controllers delegate all business logic to the service layer
+
+Output:
+Service classes and REST controllers implementing the API specification.
 ```
 
 ## Step 3 — Cross-Cutting Components
+**Model**: Gemini 3.1 Pro High / Claude Sonnet
+
 Purpose: generate system infrastructure.
 
 Prompt:
 ```
-Generate cross-cutting components following the JavaBackendArchitect skill.
+Use the JavaBackendArchitect skill.
+
+Generate cross-cutting infrastructure components for the backend.
+
+Tasks:
+- Implement centralized exception handling
+- Implement standardized API error responses
+- Configure structured logging for services
+- Provide shared configuration and utilities used across modules
+
+Output:
+Exception handlers, shared configuration classes, and logging utilities.
 ```
 
-## Step 4 — Docker Support (optional)
+## Step 4 — Unit Tests
+**Model**: Gemini 3.1 Pro Low
+
+Prompt:
+```
+Use the JavaTestArchitect skill.
+
+Generate unit tests for the services domain.
+
+Inputs:
+- Service classes
+- REST controllers
+
+Tasks:
+- Generate service layer unit tests
+- Generate controller layer unit tests using MockMvc
+
+Output:
+JUnit 5 unit tests for services and controllers.
+```
+
+## Step 5 — Docker Support (optional)
 Prompt:
 ```
 Generate Dockerfile for this Spring Boot application.
 ```
 
-## step 4 - generate initial or mock data
-generate class to initialize 2 escalation policies if there is no records in database.
-
-## Step 6 — Generate Postman Collections
+## step 6 - generate initial or mock data
+**Model**: Gemini 3.1 Pro (Low)
 Prompt:
 ```
-Generate Postman collections for this service at ./docs/postman
+Use the JavaBackendArchitect skill.
+
+Generate a database seeder for the Services Management module with 3 records and their related entities.
+```
+
+## Step 7 — Generate Postman Collections
+**Model**: Gemini 3.1 Pro (Low)| Flash
+
+Prompt:
+```
+Generate a Postman collection for this service using specs/services-api-spec.yaml.
+
+Save the collection JSON to: ticket-mgt-api-java/docs/
 ```
